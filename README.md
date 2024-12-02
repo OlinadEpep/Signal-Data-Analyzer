@@ -27,7 +27,7 @@
 ## Install dependencies using:
 
 ```bash
-pip install -r requirements.txt
+pip install pandas matplotlib wordcloud reportlab ttkthemes pysqlcipher3
 ```
 ## Usage 
 
