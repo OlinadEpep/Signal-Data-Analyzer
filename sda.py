@@ -1,12 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import json
-import os
-import platform
 import subprocess
 import pandas as pd
-import sqlite3
-import getpass  
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import matplotlib.ticker as ticker
@@ -17,22 +13,8 @@ from ttkthemes import ThemedTk
 from zoneinfo import ZoneInfo
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
-import pysqlcipher3
-import sys
-import shutil 
 import subprocess
-
-import os
-import subprocess
-import shutil
 import tkinter.messagebox as messagebox
-
-
-import os
-import subprocess
-import shutil
-import tkinter.messagebox as messagebox
-import pathlib
 
 def run_ex_sh(self=None):
     """
