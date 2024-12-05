@@ -263,6 +263,54 @@ class SignalDataAnalyzer:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
 
     def export_to_pdf(self):
+        """Esporta i messaggi filtrati in un file PDF"""
+        if not self.tree.get_children():
+            messagebox.showwarning("Attenzione", "Nessun messaggio da esportare.")
+            return
+        
+        file_path = filedialog.asksaveasfilename(
+            title="Salva come PDF",
+            defaultextension=".pdf",
+            filetypes=[("File PDF", "*.pdf")]
+        )
+
+        if not file_path:
+            return  # L'utente ha annullato il salvataggio
+        
+        try:
+            # Creazione dei dati della tabella
+            data = [["Conversazione", "Messaggio", "Data", "Ora", "Fuso Orario", "Tipo"]]
+            for item in self.tree.get_children():
+                values = self.tree.item(item, "values")
+                data.append(values)
+            
+            # Creazione del documento PDF
+            pdf = SimpleDocTemplate(file_path)
+            elements = []
+            
+            # Creazione della tabella
+            table = Table(data)
+            
+            # Stile della tabella
+            style = TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ])
+            table.setStyle(style)
+
+            elements.append(table)
+
+            # Genera il file PDF
+            pdf.build(elements)
+
+            messagebox.showinfo("Successo", "Conversazioni esportate con successo!")
+        except Exception as e:
+            messagebox.showerror("Errore", f"Errore durante l'esportazione: {e}")
             """Esporta i messaggi filtrati in un file PDF"""
             if not self.tree.get_children():
                 messagebox.showwarning("Attenzione", "Nessun messaggio da esportare.")
@@ -562,9 +610,10 @@ class SignalDataAnalyzer:
             # Ottieni il fuso orario formattato
             timezone = timestamp.strftime('%z')
             if timezone:
-                timezone = f"{timezone[:3]}:{timezone[3:]}"  # Aggiungi : tra ore e minuti
+                # Aggiungi UTC prima del fuso orario
+                timezone = f"UTC {timezone[:3]}:{timezone[3:]}"
             else:
-                timezone = "+02:00"  # Default per Roma se non riconosciuto
+                timezone = "UTC +02:00"  # Default per Roma se non riconosciuto
             
             profile_name = self.conversation_dict.get(row['conversationId'], "Sconosciuto")
             direction = "↑ Inviato" if row['type'] == 'outgoing' else "↓ Ricevuto"
@@ -604,15 +653,7 @@ class SignalDataAnalyzer:
             
             # Filtra per data
             date = self.date_entry.get()
-            if date:
-                try:
-                    search_date = datetime.strptime(date, '%Y-%m-%d').date()
-                    date_mask = pd.to_datetime(filtered_data['timestamp'], 
-                                             unit='ms').dt.date == search_date
-                    filtered_data = filtered_data[date_mask]
-                except ValueError:
-                    messagebox.showwarning("Attenzione", 
-                                         "Formato data non valido. Usa YYYY-MM-DD")
+            
             
             # Filtra per tipo di messaggio
             message_type = self.type_combobox.get()
